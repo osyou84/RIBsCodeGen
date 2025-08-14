@@ -11,8 +11,9 @@ struct Node: CustomStringConvertible {
     let spaceCount: Int
     let ribName: String
     let isOwnsView: Bool
+    let isOwnsSwiftUIView: Bool
 
     var description: String {
-        "<space: \(spaceCount), name: \(ribName), isOwnsView: \(isOwnsView)>"
+        "<space: \(spaceCount), name: \(ribName), isOwnsView: \(isOwnsView), isOwnsSwiftUIView: \(isOwnsSwiftUIView)>"
     }
 }

@@ -13,14 +13,17 @@ struct CreateRIBCommand: Command {
     let needsCreateTargetFile: Bool
     let targetDirectory: String
     let templateDirectory: String
+    let swiftUIViewDirectory: String?
     let target: String
     let isOwnsView: Bool
+    let isOwnsSwiftUIView: Bool
     let isNeedle: Bool
 
     init(paths: [String],
          setting: Setting,
          target: String,
          isOwnsView: Bool,
+         isOwnsSwiftUIView: Bool,
          isNeedle: Bool) {
         var targetPaths = [String?]()
 
@@ -36,6 +39,11 @@ struct CreateRIBCommand: Command {
         if isOwnsView {
             let targetViewControllerPath = paths.filter({ $0.contains("/" + target + "ViewController.swift") }).first
             targetPaths.append(targetViewControllerPath)
+            
+            if isOwnsSwiftUIView {
+                 let targetSwiftUIViewPath = paths.filter({ $0.contains("/" + target + "View.swift") }).first
+                 targetPaths.append(targetSwiftUIViewPath)
+            }
         }
 
         needsCreateTargetFile = targetPaths.contains(nil)
@@ -43,10 +51,12 @@ struct CreateRIBCommand: Command {
         targetDirectory = setting.targetDirectory
         let parentDirectory = isNeedle ? setting.templateDirectory + "/Needle" : setting.templateDirectory + "/Normal"
         templateDirectory = isOwnsView ? parentDirectory + "/OwnsView" : parentDirectory + "/Default"
+        swiftUIViewDirectory = setting.swiftUIViewDirectory
 
         
         self.target = target
         self.isOwnsView = isOwnsView
+        self.isOwnsSwiftUIView = isOwnsSwiftUIView
         self.isNeedle = isNeedle
     }
 
@@ -89,11 +99,28 @@ private extension CreateRIBCommand {
     }
 
     func createFiles() throws {
-        let fileTypes: [String]
+        var fileTypes: [String]
         if isOwnsView {
             fileTypes = ["Router", "Interactor", "Builder", "ViewController"]
         } else {
             fileTypes = ["Router", "Interactor", "Builder"]
+        }
+        
+        if let swiftUIViewDirectory {
+            // TODO: 後でリファクタ
+            let filePath = "\(swiftUIViewDirectory)/\(target)View.swift"
+            print("  Creating file: \(filePath)")
+            print(templateDirectory + "/View.swift")
+            let template: String = try Path(templateDirectory + "/View.swift").read()
+            let replacedText = template
+                .replacingOccurrences(of: "___VARIABLE_productName___", with: "\(target)")
+                .replacingOccurrences(of: "___VARIABLE_productName_lowercased___", with: "\(target.lowercasedFirstLetter())")
+            try Path(filePath).write(replacedText)
+            let formattedText = try Formatter.format(path: filePath)
+            try Path(filePath).write(formattedText)
+            print(4)
+        } else {
+            fileTypes.append("View")
         }
 
         try fileTypes.forEach { fileType in

@@ -12,6 +12,7 @@ import PathKit
 struct CreateComponentExtension: Command {
     let needsCreateTargetFile: Bool
     let targetDirectory: String
+    let swiftUIViewDirectory: String?
     let templateDirectory: String
     let parent: String
     let child: String
@@ -22,6 +23,7 @@ struct CreateComponentExtension: Command {
          child: String) {
         targetDirectory = setting.targetDirectory
         templateDirectory = setting.templateDirectory
+        swiftUIViewDirectory = setting.swiftUIViewDirectory
         needsCreateTargetFile = paths.filter({ $0.contains("/\(parent)Component+\(child).swift") }).isEmpty
 
         self.parent = parent

@@ -299,6 +299,7 @@ func makeCreateRIBCommand(argument: Argument, isNeedle: Bool) -> Command {
                             setting: setting,
                             target: argument.actionTarget,
                             isOwnsView: !argument.noView,
+                            isOwnsSwiftUIView: !argument.noView ? !argument.swiftui : false,
                             isNeedle: isNeedle)
 }
 
@@ -308,6 +309,7 @@ func makeCreateRIBCommand(edge: Edge) -> Command {
                             setting: setting,
                             target: edge.target,
                             isOwnsView: edge.isOwnsView,
+                            isOwnsSwiftUIView: edge.isOwnsSwiftUIView,
                             isNeedle: edge.isNeedle)
 }
 
@@ -366,7 +368,8 @@ func makeEdges(argument: Argument) -> [Edge] {
             let erasedSpaceRIBName = ribName.replacingOccurrences(of: " ", with: "")
             let isOwnsView = !erasedSpaceRIBName.contains("*")
             let extractedRIBNameString = erasedSpaceRIBName.replacingOccurrences(of: "*", with: "")
-            return Node(spaceCount: spaceCount, ribName: extractedRIBNameString, isOwnsView: isOwnsView)
+            // TODO: 記号を決めてisOwnsSwiftUIViewの真偽値を決める
+            return Node(spaceCount: spaceCount, ribName: extractedRIBNameString, isOwnsView: isOwnsView, isOwnsSwiftUIView: false)
         }
         .compactMap { $0 }
 
@@ -381,11 +384,11 @@ func makeEdges(argument: Argument) -> [Edge] {
         let nodeIsNeedle = validateBuilderIsNeedle(builderFilePath: nodeBuilderPath)
 
         guard let parentNode = filteredNodes.filter({ $0.spaceCount < node.spaceCount }).first else {
-            edges.append(Edge(parent: argumentParentRIBName, target: node.ribName, isOwnsView: node.isOwnsView, isNeedle: nodeIsNeedle))
+            edges.append(Edge(parent: argumentParentRIBName, target: node.ribName, isOwnsView: node.isOwnsView, isOwnsSwiftUIView: node.isOwnsSwiftUIView, isNeedle: nodeIsNeedle))
             continue
         }
 
-        edges.append(Edge(parent: parentNode.ribName, target: node.ribName, isOwnsView: node.isOwnsView, isNeedle: nodeIsNeedle))
+        edges.append(Edge(parent: parentNode.ribName, target: node.ribName, isOwnsView: node.isOwnsView, isOwnsSwiftUIView: node.isOwnsSwiftUIView, isNeedle: nodeIsNeedle))
     }
 
     return edges.reversed()

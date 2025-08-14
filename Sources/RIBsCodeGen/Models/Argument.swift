@@ -84,6 +84,10 @@ extension Argument {
     var needle: Bool {
         options["needle"] != nil // "--needleの存在有無"
     }
+    
+    var swiftui: Bool {
+        options["swiftui"] != nil
+    }
 
     var actionTarget: String {
         switch action {
