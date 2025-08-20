@@ -298,8 +298,7 @@ func makeCreateRIBCommand(argument: Argument, isNeedle: Bool) -> Command {
     return CreateRIBCommand(paths: paths,
                             setting: setting,
                             target: argument.actionTarget,
-                            isOwnsView: !argument.noView,
-                            isOwnsSwiftUIView: !argument.noView ? !argument.swiftui : false,
+                            viewCreationOptions: argument.viewCreationOptions,
                             isNeedle: isNeedle)
 }
 
@@ -308,8 +307,7 @@ func makeCreateRIBCommand(edge: Edge) -> Command {
     return CreateRIBCommand(paths: paths,
                             setting: setting,
                             target: edge.target,
-                            isOwnsView: edge.isOwnsView,
-                            isOwnsSwiftUIView: edge.isOwnsSwiftUIView,
+                            viewCreationOptions: edge.viewCreationOptions,
                             isNeedle: edge.isNeedle)
 }
 
@@ -366,10 +364,20 @@ func makeEdges(argument: Argument) -> [Edge] {
                 return nil
             }
             let erasedSpaceRIBName = ribName.replacingOccurrences(of: " ", with: "")
-            let isOwnsView = !erasedSpaceRIBName.contains("*")
-            let extractedRIBNameString = erasedSpaceRIBName.replacingOccurrences(of: "*", with: "")
-            // TODO: 記号を決めてisOwnsSwiftUIViewの真偽値を決める
-            return Node(spaceCount: spaceCount, ribName: extractedRIBNameString, isOwnsView: isOwnsView, isOwnsSwiftUIView: false)
+            var extractedRIBNameString = erasedSpaceRIBName
+            let viewCreationOptions: ViewCreationOptions
+            
+            if erasedSpaceRIBName.contains("*") {
+                viewCreationOptions = .createUIKit
+                extractedRIBNameString = erasedSpaceRIBName.replacingOccurrences(of: "*", with: "")
+            } else if erasedSpaceRIBName.contains("@") {
+                viewCreationOptions = .createSwiftUI
+                extractedRIBNameString = erasedSpaceRIBName.replacingOccurrences(of: "@", with: "")
+            } else {
+                viewCreationOptions = .none
+            }
+
+            return Node(spaceCount: spaceCount, ribName: extractedRIBNameString, viewCreationOptions: viewCreationOptions)
         }
         .compactMap { $0 }
 
@@ -384,11 +392,11 @@ func makeEdges(argument: Argument) -> [Edge] {
         let nodeIsNeedle = validateBuilderIsNeedle(builderFilePath: nodeBuilderPath)
 
         guard let parentNode = filteredNodes.filter({ $0.spaceCount < node.spaceCount }).first else {
-            edges.append(Edge(parent: argumentParentRIBName, target: node.ribName, isOwnsView: node.isOwnsView, isOwnsSwiftUIView: node.isOwnsSwiftUIView, isNeedle: nodeIsNeedle))
+            edges.append(Edge(parent: argumentParentRIBName, target: node.ribName, viewCreationOptions: node.viewCreationOptions, isNeedle: nodeIsNeedle))
             continue
         }
 
-        edges.append(Edge(parent: parentNode.ribName, target: node.ribName, isOwnsView: node.isOwnsView, isOwnsSwiftUIView: node.isOwnsSwiftUIView, isNeedle: nodeIsNeedle))
+        edges.append(Edge(parent: parentNode.ribName, target: node.ribName, viewCreationOptions: node.viewCreationOptions, isNeedle: nodeIsNeedle))
     }
 
     return edges.reversed()

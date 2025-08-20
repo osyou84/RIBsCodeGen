@@ -107,4 +107,12 @@ extension Argument {
             return ""
         }
     }
+    
+    var viewCreationOptions: ViewCreationOptions {
+        if noView {
+            return .none
+        } else {
+            return swiftui ? .createSwiftUI : .createUIKit
+        }
+    }
 }
