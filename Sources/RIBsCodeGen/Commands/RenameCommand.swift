@@ -51,6 +51,7 @@ final class RenameCommand: Command {
     private let routerPath: String
     private let builderPath: String
     private let viewControllerPath: String?
+    private let viewPath: String?
     private let currentDependenciesPath: [String]
     private var parents: [String] = []
 
@@ -82,6 +83,7 @@ final class RenameCommand: Command {
         self.routerPath = routerPath
         self.builderPath = builderPath
         viewControllerPath = paths.filter({ $0.contains("/" + currentName + "ViewController.swift") }).first
+        viewPath = paths.filter({ $0.contains("/" + currentName + "View.swift") }).first
         currentDependenciesPath = paths.filter({ $0.contains("/" + currentName + "/Dependencies/") })
     }
     
@@ -120,6 +122,12 @@ final class RenameCommand: Command {
             try renameForViewController()
         } catch {
             result = .failure(error: .failedToRename("Failed to rename operation for target ViewController."))
+        }
+        
+        do {
+            try renameForView()
+        } catch {
+            result = .failure(error: .failedToRename("Failed to rename operation for target View."))
         }
     
         do {
@@ -264,6 +272,21 @@ private extension RenameCommand {
         
         try Path(viewControllerPath).write(replacedText)
         replacedFilePaths.append(viewControllerPath)
+    }
+    
+    func renameForView() throws {
+        guard let viewPath else { return }
+        
+        print("\t\trename for \(viewPath.lastElementSplittedBySlash)")
+        let text = try String.init(contentsOfFile: viewPath, encoding: .utf8)
+        let replacedText = renameSetting.view.reduce(text) { (result, viewSearchText) in
+            let searchText = replacePlaceHolder(for: viewSearchText, with: currentName)
+            let replaceText = replacePlaceHolder(for: viewSearchText, with: newName)
+            return result.replacingOccurrences(of: searchText, with: replaceText)
+        }
+        
+        try Path(viewPath).write(replacedText)
+        replacedFilePaths.append(viewPath)
     }
     
     func renameForDependencies() throws {

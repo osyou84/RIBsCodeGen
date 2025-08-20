@@ -17,6 +17,9 @@ struct HelpCommand: Command {
 
         - add RIB
         ribscodegen add [target RIB name]
+        
+        - add SwiftUI RIB
+        ribscodegen add [target RIB name] --swiftui
 
         - add viewless RIB
         ribscodegen add [target RIB name] --noview

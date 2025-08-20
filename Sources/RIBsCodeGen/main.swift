@@ -368,13 +368,13 @@ func makeEdges(argument: Argument) -> [Edge] {
             let viewCreationOptions: ViewCreationOptions
             
             if erasedSpaceRIBName.contains("*") {
-                viewCreationOptions = .createUIKit
-                extractedRIBNameString = erasedSpaceRIBName.replacingOccurrences(of: "*", with: "")
+                viewCreationOptions = .none
             } else if erasedSpaceRIBName.contains("@") {
                 viewCreationOptions = .createSwiftUI
                 extractedRIBNameString = erasedSpaceRIBName.replacingOccurrences(of: "@", with: "")
             } else {
-                viewCreationOptions = .none
+                viewCreationOptions = .createUIKit
+                extractedRIBNameString = erasedSpaceRIBName.replacingOccurrences(of: "*", with: "")
             }
 
             return Node(spaceCount: spaceCount, ribName: extractedRIBNameString, viewCreationOptions: viewCreationOptions)

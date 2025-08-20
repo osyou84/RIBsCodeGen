@@ -17,6 +17,7 @@ struct RenameSetting: Codable {
     var builder: [String]
     var router: [String]
     var viewController: [String]
+    var view: [String]
     var componentExtension: [String]
     var parentInteractor: [String]
     var parentNormalBuilder: [String]

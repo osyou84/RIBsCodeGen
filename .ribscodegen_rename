@@ -49,6 +49,14 @@ viewController:
   - "class __RIB_NAME__ViewController:"
   - "extension __RIB_NAME__ViewController"
   - "__RIB_NAME__ViewControllable"
+view:
+  - "__RIB_NAME__View.swift"
+  - "protocol __RIB_NAME__ViewListener"
+  - "struct __RIB_NAME__View"
+  - "weak var listener: __RIB_NAME__ViewListener"
+  - "Text("__RIB_NAME__View")"
+  - "struct __RIB_NAME__View_Previews"
+  - "__RIB_NAME__View(dataSource: __RIB_NAME__View"
 componentExtension:
   - "protocol __RIB_NAME__Dependency"
   - "__RIB_NAME__Component"
