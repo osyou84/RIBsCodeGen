@@ -22,10 +22,12 @@ final class ___VARIABLE_productName___ViewController: UIViewController, ___VARIA
         rootView.listener = listener
 
         let hostingController = UIHostingController(rootView: rootView)
-//        hostingController.view.backgroundColor = .clear
-//        hostingController.disableSafeArea()
-//        hostingController.sizingOptions = [.intrinsicContentSize]
-        fill(with: hostingController)
+        hostingController.view.backgroundColor = .clear
+        hostingController.sizingOptions = [.intrinsicContentSize]
+        
+        addChild(hostingController)
+        view.fill(with: hostingController.view)
+        hostingController.didMove(toParent: self)
     }
 }
 

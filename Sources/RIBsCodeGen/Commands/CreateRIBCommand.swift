@@ -30,7 +30,6 @@ struct CreateRIBCommand: Command {
     let needsCreateTargetFile: Bool
     let targetDirectory: String
     let templateDirectory: String
-    let swiftUIViewDirectory: String?
     let target: String
     let viewCreationOptions: ViewCreationOptions
     let isNeedle: Bool
@@ -69,8 +68,6 @@ struct CreateRIBCommand: Command {
         targetDirectory = setting.targetDirectory
         let parentDirectory = isNeedle ? setting.templateDirectory + "/Needle" : setting.templateDirectory + "/Normal"
         templateDirectory = parentDirectory + viewCreationOptions.templateDirectory
-        swiftUIViewDirectory = setting.swiftUIViewDirectory
-
         
         self.target = target
         self.viewCreationOptions = viewCreationOptions
@@ -129,13 +126,7 @@ private extension CreateRIBCommand {
 
         // target = RIB Name
         try fileTypes.forEach { fileType in
-            let filePath: String = {
-                if fileType == "View", let swiftUIViewDirectory {
-                    return "\(swiftUIViewDirectory)/\(target)View.swift"
-                } else {
-                    return targetDirectory + "/\(target)/\(target)\(fileType).swift"
-                }
-            }()
+            let filePath = targetDirectory + "/\(target)/\(target)\(fileType).swift"
             
             print("  Creating file: \(filePath)")
             let template: String = try Path(templateDirectory + "/\(fileType).swift").read()

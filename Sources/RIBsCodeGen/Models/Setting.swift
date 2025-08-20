@@ -10,7 +10,6 @@ import Foundation
 struct Setting: Codable {
     var targetDirectory: String
     var templateDirectory: String
-    var swiftUIViewDirectory: String?
 }
 
 struct RenameSetting: Codable {
